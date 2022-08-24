@@ -9,14 +9,17 @@ export default class TicketService {
    */
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
+    let returnValue = -1;
     try{
       if(accountId <= 0){
         throw new InvalidPurchaseException("Invalid accountId", `Invalid account Id: ${accountId}`);
       }
   
       // Check if the number of the ticket types bought is already over the limit, then there will be no need to check how many tickets bought in total
-      if(ticketTypeRequests.length > 20){
-        throw InvalidPurchaseException("Maximum number of tickets exceeded", `Maximum number of tickets exceeded by: ${ticketTypeRequests.length - 20}`);
+      if(ticketTypeRequests.length <= 0){
+        throw new InvalidPurchaseException("Tickets cannot be less than 1", "Minimum number of tickets not bought");
+      }else if(ticketTypeRequests.length > 20){
+        throw new InvalidPurchaseException("Maximum number of tickets exceeded", `Maximum number of tickets exceeded by: ${ticketTypeRequests.length - 20}`);
       }else{
         let ticketType = this.#getNumSeatsAmount(...ticketTypeRequests);
         
@@ -25,10 +28,17 @@ export default class TicketService {
   
         // Reserve seats
         new SeatReservationService().reserveSeat(accountId, ticketType.noAdult + ticketType.noChild)
+
+        // Return 1 if everything works smoothly
+        returnValue = 1;
       }
     }finally{
       console.log("Something went wrong, please try again!");
+      // Return -1 if something went wrong
+      returnValue = -1;
     }
+
+    return returnValue;
   }
 
   // Gets the number of seats for each category of Ticket
@@ -54,7 +64,7 @@ export default class TicketService {
           noAdult += ticket.getNoOfTickets();
           break;
         default:
-          throw InvalidPurchaseException("Invalid ticket type", `Invalid ticket type: ${ticket.getTicketType()}`);
+          throw new InvalidPurchaseException("Invalid ticket type", `Invalid ticket type: ${ticket.getTicketType()}`);
       }
     });
     
@@ -63,7 +73,7 @@ export default class TicketService {
 
     // Assumption: Only one Adult or Child is permitted to hold one Infant
     if(noAdult + noChild < noInfant){
-      throw InvalidPurchaseException
+      throw new InvalidPurchaseException("Cannot have more infants", `Invalid number of infants: ${noInfant}`);
     }
 
     return {
