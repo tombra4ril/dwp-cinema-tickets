@@ -1,3 +1,7 @@
 export default class InvalidPurchaseException extends Error {
-  // console.log("Error");
+  constructor(message, cause) {
+    super(message);
+    this.cause = cause;
+    this.name = 'InvalidPurchaseException';
+  }
 }
