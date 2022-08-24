@@ -6,4 +6,4 @@ const adults = new TicketTypeRequest("ADULT", 3);
 const infants = new TicketTypeRequest("INFANT", 5);
 const children = new TicketTypeRequest("CHILD", 5);
 
-ticketService.purchaseTickets(-1, [adults, infants, children]);
+ticketService.purchaseTickets(5, [adults, infants, children]);

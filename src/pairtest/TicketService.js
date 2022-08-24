@@ -9,33 +9,29 @@ export default class TicketService {
    */
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
+    // Return value
     let returnValue = -1;
-    try{
-      if(accountId <= 0){
-        throw new InvalidPurchaseException("Invalid accountId", `Invalid account Id: ${accountId}`);
-      }
-  
-      // Check if the number of the ticket types bought is already over the limit, then there will be no need to check how many tickets bought in total
-      if(ticketTypeRequests.length <= 0){
-        throw new InvalidPurchaseException("Tickets cannot be less than 1", "Minimum number of tickets not bought");
-      }else if(ticketTypeRequests.length > 20){
-        throw new InvalidPurchaseException("Maximum number of tickets exceeded", `Maximum number of tickets exceeded by: ${ticketTypeRequests.length - 20}`);
-      }else{
-        let ticketType = this.#getNumSeatsAmount(...ticketTypeRequests);
-        
-        // Make payment
-        new TicketPaymentService().makePayment(accountId, ticketType.totalAmount);
-  
-        // Reserve seats
-        new SeatReservationService().reserveSeat(accountId, ticketType.noAdult + ticketType.noChild)
+    
+    if(accountId <= 0){
+      throw new InvalidPurchaseException("Invalid accountId", `Invalid account Id: ${accountId}`);
+    }
 
-        // Return 1 if everything works smoothly
-        returnValue = 1;
-      }
-    }finally{
-      console.log("Something went wrong, please try again!");
-      // Return -1 if something went wrong
-      returnValue = -1;
+    // Check if the number of the ticket types bought is already over the limit, then there will be no need to check how many tickets bought in total
+    if(ticketTypeRequests.length <= 0){
+      throw new InvalidPurchaseException("Tickets cannot be less than 1", "Minimum number of tickets not bought");
+    }else if(ticketTypeRequests.length > 20){
+      throw new InvalidPurchaseException("Maximum number of tickets exceeded", `Maximum number of tickets exceeded by: ${ticketTypeRequests.length - 20}`);
+    }else{
+      let ticketType = this.#getNumSeatsAmount(...ticketTypeRequests);
+      
+      // Make payment
+      new TicketPaymentService().makePayment(accountId, ticketType.totalAmount);
+
+      // Reserve seats
+      new SeatReservationService().reserveSeat(accountId, ticketType.noAdult + ticketType.noChild)
+
+      // Return total amount and number of seats, if everything works smoothly
+      returnValue = [ticketType.totalAmount, ticketType.noAdult + ticketType.noChild];
     }
 
     return returnValue;
