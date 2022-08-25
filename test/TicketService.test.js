@@ -24,16 +24,3 @@ describe("TicketService methods testing", () => {
     expect(ticketService.purchaseTickets(5, [adults, infants, children])).toEqual([160, 13]);
   });
 });
-
-describe("Invalide exception throwing", () => {
-  let ticketService = new TicketService();
-  let adults = new TicketTypeRequest("ADULT", 3);
-  let infants = new TicketTypeRequest("INFANT", 5);
-  let children = new TicketTypeRequest("CHILD", 5);
-  //
-  test("Number of adults and children less than number of infants", () => {
-    let infants = new TicketTypeRequest("INFANT", 10);
-    expect(ticketService.purchaseTickets(5, [adults, infants, children])).toThrow(new InvalidPurchaseException("Cannot have more infants", "Invalid number of infants: 10"));
-  });
-
-});
